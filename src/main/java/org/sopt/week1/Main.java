@@ -11,7 +11,7 @@ public class Main {
             ui = new DiaryUI(new DiaryController());
             ui.runRepeatedly();
         } catch (Throwable t) {
-
+            t.printStackTrace();
         }
     }
 
@@ -97,6 +97,11 @@ public class Main {
                         case "FINISH" -> {
                             server.finish();
                         }
+                        case "RESTORE" -> {
+                            ConsoleIO.printLine("복구할 id 를 입력하세요!");
+                            final String inputId = ConsoleIO.readLine();
+                            server.restore(inputId);
+                        }
                         default -> {
                             throw new InvalidInputException();
                         }
@@ -125,6 +130,8 @@ public class Main {
                     - POST : 일기 작성하기
                     - DELETE : 일기 제거하기
                     - PATCH : 일기 수정하기
+                    - RESTORE : 일기 복원하기
+                    - FINISH: 종료
                     """;
 
         }
@@ -138,7 +145,6 @@ public class Main {
         }
     }
 
-    // not thread safe
     private static class ConsoleIO {
         private final static BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(System.out));
         private final static BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
