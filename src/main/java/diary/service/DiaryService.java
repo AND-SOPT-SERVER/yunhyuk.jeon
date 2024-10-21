@@ -1,9 +1,13 @@
 package diary.service;
 
+import diary.dto.Diary;
+import diary.exception.ConflictException;
 import diary.exception.LengthException;
 import diary.exception.NotFoundException;
+import diary.exception.TimeLimitException;
 import diary.repository.DiaryEntity;
 import diary.repository.DiaryRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,11 +27,25 @@ public class DiaryService {
         } else if (content.length() > 30) {
             throw new LengthException("내용은 30자 이하로 작성해주세요.");
         }
+
+        if (diaryRepository.findByTitle(title) != null) {
+            throw new ConflictException("같은 제목의 일기가 이미 존재합니다.");
+        }
+
+        DiaryEntity lastDiary = diaryRepository.findTopByOrderByIdDesc().orElse(null);
+        if (lastDiary != null) {
+            LocalDateTime lastDate = lastDiary.getDate();
+            LocalDateTime now = LocalDateTime.now();
+            if (now.isBefore(lastDate.plusMinutes(5))) {
+                throw new TimeLimitException("5분에 한 번 일기를 작성할 수 있습니다.");
+            }
+        }
+
         diaryRepository.save(new DiaryEntity(title, content, LocalDateTime.now()));
     }
 
-    public ArrayList<Diary> getList(){
-        final List<DiaryEntity> diaryEntityList = diaryRepository.findAll();
+    public ArrayList<Diary> getAllDiary(){
+        final List<DiaryEntity> diaryEntityList = diaryRepository.findAllByOrderByIdDesc();
 
         final ArrayList<Diary> diaryList = new ArrayList<>();
 
@@ -40,8 +58,22 @@ public class DiaryService {
         return diaryList;
     }
 
-    public ArrayList<Diary> getRecentList() {
+    public ArrayList<Diary> getRecentDiary() {
         List<DiaryEntity> diaryEntityList = diaryRepository.findTop10ByOrderByIdDesc();
+
+        ArrayList<Diary> diaryList = new ArrayList<>();
+
+        for (DiaryEntity diaryEntity : diaryEntityList) {
+            diaryList.add(
+                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate())
+            );
+        }
+
+        return diaryList;
+    }
+
+    public ArrayList<Diary> getSortedDiary() {
+        List<DiaryEntity> diaryEntityList = diaryRepository.findTop10ByContentLength(PageRequest.of(0, 10));
 
         ArrayList<Diary> diaryList = new ArrayList<>();
 

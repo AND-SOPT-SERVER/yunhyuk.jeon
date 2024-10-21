@@ -4,7 +4,7 @@ import diary.dto.DiaryDetailResponse;
 import diary.dto.DiaryListResponse;
 import diary.dto.DiaryRequest;
 import diary.dto.DiaryResponse;
-import diary.service.Diary;
+import diary.dto.Diary;
 import diary.service.DiaryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,25 +25,37 @@ public class DiaryController {
         diaryService.createDiary(diaryRequest.title(), diaryRequest.content());
     }
 
-    @GetMapping("/api/diary")
+    @GetMapping("/api/diary/all")
     ResponseEntity<DiaryListResponse> get(){
-        List<Diary> diaryList = diaryService.getList();
+        List<Diary> diaryList = diaryService.getAllDiary();
 
         List<DiaryResponse> diaryResponseList = new ArrayList<>();
         for(Diary diary : diaryList){
-            diaryResponseList.add(new DiaryResponse(diary.getId(), diary.getTitle()));
+            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title()));
         }
 
         return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
     }
 
-    @GetMapping("/api/diary/recent")
+    @GetMapping("/api/diary")
     ResponseEntity<DiaryListResponse> getRecent(){
-        List<Diary> diaryList = diaryService.getRecentList();
+        List<Diary> diaryList = diaryService.getRecentDiary();
 
         List<DiaryResponse> diaryResponseList = new ArrayList<>();
         for(Diary diary : diaryList){
-            diaryResponseList.add(new DiaryResponse(diary.getId(), diary.getTitle()));
+            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title()));
+        }
+
+        return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
+    }
+
+    @GetMapping("/api/diary/sorted")
+    ResponseEntity<DiaryListResponse> getSorted(){
+        List<Diary> diaryList = diaryService.getSortedDiary();
+
+        List<DiaryResponse> diaryResponseList = new ArrayList<>();
+        for (Diary diary : diaryList){
+            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title()));
         }
 
         return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
@@ -53,7 +65,7 @@ public class DiaryController {
     ResponseEntity<DiaryDetailResponse> getById(@PathVariable Long id) {
         Diary diary = diaryService.getDiaryById(id);
 
-        return ResponseEntity.ok(new DiaryDetailResponse(diary.getId(), diary.getTitle(), diary.getContent(), diary.getDate()));
+        return ResponseEntity.ok(new DiaryDetailResponse(diary.id(), diary.title(), diary.content(), diary.date()));
     }
 
     @PatchMapping("api/diary/{id}")
