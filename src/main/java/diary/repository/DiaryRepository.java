@@ -15,4 +15,5 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
     @Query("SELECT d FROM DiaryEntity d ORDER BY LENGTH(d.content) DESC, d.id DESC")
     List<DiaryEntity> findTop10ByContentLength(PageRequest pageRequest);
     DiaryEntity findByTitle(String title);
+    List<DiaryEntity> findByCategoryOrderByIdDesc(DiaryEntity.Category category);
 }

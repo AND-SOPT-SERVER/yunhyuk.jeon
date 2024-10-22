@@ -22,7 +22,8 @@ public class DiaryController {
 
     @PostMapping("/api/diary")
     void post(@RequestBody DiaryRequest diaryRequest){
-        diaryService.createDiary(diaryRequest.title(), diaryRequest.content());
+        diaryRequest.validate();
+        diaryService.createDiary(diaryRequest.title(), diaryRequest.content(), diaryRequest.category());
     }
 
     @GetMapping("/api/diary/all")
@@ -65,12 +66,13 @@ public class DiaryController {
     ResponseEntity<DiaryDetailResponse> getById(@PathVariable Long id) {
         Diary diary = diaryService.getDiaryById(id);
 
-        return ResponseEntity.ok(new DiaryDetailResponse(diary.id(), diary.title(), diary.content(), diary.date()));
+        return ResponseEntity.ok(new DiaryDetailResponse(diary.id(), diary.title(), diary.content(), diary.date(), diary.category()));
     }
 
     @PatchMapping("api/diary/{id}")
     void update(@PathVariable Long id, @RequestBody DiaryRequest diaryRequest){
-        diaryService.updateDiary(id, diaryRequest.title(), diaryRequest.content());
+        diaryRequest.validate();
+        diaryService.updateDiary(id, diaryRequest.title(), diaryRequest.content(), diaryRequest.category());
     }
 
     @DeleteMapping("api/diary/{id}")
