@@ -14,36 +14,51 @@ public class DiaryEntity {
     public String content;
     public LocalDateTime date;
 
-    public DiaryEntity(){
-    }
+    @Enumerated(EnumType.STRING)
+    public Category category;
 
-    public DiaryEntity(String title, String content, LocalDateTime date){
+    public DiaryEntity() {}
+
+    public DiaryEntity(String title, String content, LocalDateTime date, Category category) {
         this.title = title;
         this.content = content;
         this.date = date;
+        this.category = category;
     }
 
-    public long getId(){
+    public enum Category {
+        DAILY, FOOD, EXERCISE, WORK, STUDY, OTHER
+    }
+
+    public long getId() {
         return id;
     }
 
-    public String getTitle(){
+    public String getTitle() {
         return title;
     }
 
-    public String getContent(){
+    public String getContent() {
         return content;
     }
 
-    public LocalDateTime getDate(){
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setTitle(String title){
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setTitle(String title) {
         this.title = title;
     }
 
-    public void setContent(String content){
+    public void setContent(String content) {
         this.content = content;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }
