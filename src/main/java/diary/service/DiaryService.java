@@ -1,19 +1,16 @@
 package diary.service;
 
 import diary.dto.Diary;
-import diary.exception.ConflictException;
-import diary.exception.LengthException;
-import diary.exception.NotFoundException;
-import diary.exception.TimeLimitException;
+import diary.exception.RateLimitException;
 import diary.repository.DiaryEntity;
 import diary.repository.DiaryEntity.Category;
 import diary.repository.DiaryRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Component
 public class DiaryService {
@@ -25,13 +22,9 @@ public class DiaryService {
 
     public void createDiary(String title, String content, Category category) {
         if (title.length() > 10) {
-            throw new LengthException("제목은 10자 이하로 작성해주세요.");
+            throw new IllegalArgumentException("제목은 10자 이하로 작성해주세요.");
         } else if (content.length() > 30) {
-            throw new LengthException("내용은 30자 이하로 작성해주세요.");
-        }
-
-        if (diaryRepository.findByTitle(title) != null) {
-            throw new ConflictException("같은 제목의 일기가 이미 존재합니다.");
+            throw new IllegalArgumentException("내용은 30자 이하로 작성해주세요.");
         }
 
         DiaryEntity lastDiary = diaryRepository.findTopByOrderByIdDesc().orElse(null);
@@ -39,7 +32,7 @@ public class DiaryService {
             LocalDateTime lastDate = lastDiary.getDate();
             LocalDateTime now = LocalDateTime.now();
             if (now.isBefore(lastDate.plusMinutes(5))) {
-                throw new TimeLimitException("5분에 한 번 일기를 작성할 수 있습니다.");
+                throw new RateLimitException("5분에 한 번 일기를 작성할 수 있습니다.");
             }
         }
 
@@ -87,19 +80,19 @@ public class DiaryService {
 
     public Diary getDiaryById(Long id) {
         DiaryEntity diaryEntity = diaryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("일기를 찾을 수 없습니다. ID: " + id));
+                .orElseThrow(() -> new NoSuchElementException("일기를 찾을 수 없습니다. ID: " + id));
 
         return new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory());
     }
 
     public void updateDiary(Long id, String title, String content, Category category) {
         DiaryEntity diaryEntity = diaryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("일기를 찾을 수 없습니다. ID: " + id));
+                .orElseThrow(() -> new NoSuchElementException("일기를 찾을 수 없습니다. ID: " + id));
 
         if (title.length() > 10) {
-            throw new LengthException("제목은 10자 이하로 작성해주세요.");
+            throw new IllegalArgumentException("제목은 10자 이하로 작성해주세요.");
         } else if (content.length() > 30) {
-            throw new LengthException("내용은 30자 이하로 작성해주세요.");
+            throw new IllegalArgumentException("내용은 30자 이하로 작성해주세요.");
         }
 
         diaryEntity.setTitle(title);
@@ -110,7 +103,7 @@ public class DiaryService {
 
     public void deleteDiary(Long id) {
         DiaryEntity diaryEntity = diaryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("일기를 찾을 수 없습니다. ID: " + id));
+                .orElseThrow(() -> new NoSuchElementException("일기를 찾을 수 없습니다. ID: " + id));
         diaryRepository.deleteById(id);
     }
 

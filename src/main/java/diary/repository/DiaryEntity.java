@@ -9,8 +9,9 @@ public class DiaryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
-    @Column
+    @Column(unique = true)
     public String title;
+
     public String content;
     public LocalDateTime date;
 
