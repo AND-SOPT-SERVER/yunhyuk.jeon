@@ -1,4 +1,6 @@
 package diary.dto;
 
-public record DiaryResponse(long id, String title) {
+import diary.repository.DiaryEntity;
+
+public record DiaryResponse(long id, String title, DiaryEntity.Category category) {
 }

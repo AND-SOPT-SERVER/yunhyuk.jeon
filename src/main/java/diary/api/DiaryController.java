@@ -5,6 +5,7 @@ import diary.dto.DiaryListResponse;
 import diary.dto.DiaryRequest;
 import diary.dto.DiaryResponse;
 import diary.dto.Diary;
+import diary.repository.DiaryEntity;
 import diary.service.DiaryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,7 @@ public class DiaryController {
 
         List<DiaryResponse> diaryResponseList = new ArrayList<>();
         for(Diary diary : diaryList){
-            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title()));
+            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.category()));
         }
 
         return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
@@ -44,7 +45,7 @@ public class DiaryController {
 
         List<DiaryResponse> diaryResponseList = new ArrayList<>();
         for(Diary diary : diaryList){
-            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title()));
+            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.category()));
         }
 
         return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
@@ -56,7 +57,7 @@ public class DiaryController {
 
         List<DiaryResponse> diaryResponseList = new ArrayList<>();
         for (Diary diary : diaryList){
-            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title()));
+            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.category()));
         }
 
         return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
@@ -69,13 +70,25 @@ public class DiaryController {
         return ResponseEntity.ok(new DiaryDetailResponse(diary.id(), diary.title(), diary.content(), diary.date(), diary.category()));
     }
 
-    @PatchMapping("api/diary/{id}")
+    @GetMapping("/api/diary/category/{category}")
+    ResponseEntity<DiaryListResponse> getCategory(@PathVariable DiaryEntity.Category category){
+        List<Diary> diaryList = diaryService.getDiariesByCategory(category);
+
+        List<DiaryResponse> diaryResponseList = new ArrayList<>();
+        for (Diary diary : diaryList){
+            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.category()));
+        }
+
+        return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
+    }
+
+    @PatchMapping("/api/diary/{id}")
     void update(@PathVariable Long id, @RequestBody DiaryRequest diaryRequest){
         diaryRequest.validate();
         diaryService.updateDiary(id, diaryRequest.title(), diaryRequest.content(), diaryRequest.category());
     }
 
-    @DeleteMapping("api/diary/{id}")
+    @DeleteMapping("/api/diary/{id}")
     void delete(@PathVariable Long id){
         diaryService.deleteDiary(id);
     }
