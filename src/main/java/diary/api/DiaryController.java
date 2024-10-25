@@ -1,7 +1,6 @@
 package diary.api;
 
 import diary.dto.DiaryDetailResponse;
-import diary.dto.DiaryListResponse;
 import diary.dto.DiaryRequest;
 import diary.dto.DiaryResponse;
 import diary.dto.Diary;
@@ -9,9 +8,7 @@ import diary.repository.DiaryEntity;
 import diary.service.DiaryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import reactor.core.publisher.Flux;
 
 @RestController
 public class DiaryController {
@@ -28,58 +25,34 @@ public class DiaryController {
     }
 
     @GetMapping("/api/diary/all")
-    ResponseEntity<DiaryListResponse> get(){
-        List<Diary> diaryList = diaryService.getAllDiary();
-
-        List<DiaryResponse> diaryResponseList = new ArrayList<>();
-        for(Diary diary : diaryList){
-            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.category()));
-        }
-
-        return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
+    Flux<DiaryResponse> getAll() {
+        return diaryService.getAllDiary()
+                .flatMap(diary -> Flux.just(new DiaryResponse(diary.id(), diary.title(), diary.category())));
     }
 
     @GetMapping("/api/diary")
-    ResponseEntity<DiaryListResponse> getRecent(){
-        List<Diary> diaryList = diaryService.getRecentDiary();
-
-        List<DiaryResponse> diaryResponseList = new ArrayList<>();
-        for(Diary diary : diaryList){
-            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.category()));
-        }
-
-        return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
+    Flux<DiaryResponse> getRecent() {
+        return diaryService.getRecentDiary()
+                .flatMap(diary -> Flux.just(new DiaryResponse(diary.id(), diary.title(), diary.category())));
     }
 
     @GetMapping("/api/diary/sorted")
-    ResponseEntity<DiaryListResponse> getSorted(){
-        List<Diary> diaryList = diaryService.getSortedDiary();
+    Flux<DiaryResponse> getSorted() {
+        return diaryService.getSortedDiary()
+                .flatMap(diary -> Flux.just(new DiaryResponse(diary.id(), diary.title(), diary.category())));
+    }
 
-        List<DiaryResponse> diaryResponseList = new ArrayList<>();
-        for (Diary diary : diaryList){
-            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.category()));
-        }
-
-        return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
+    @GetMapping("/api/diary/category/{categoryId}")
+    Flux<DiaryResponse> getCategory(@PathVariable Integer categoryId) {
+        DiaryEntity.Category category = DiaryEntity.Category.values()[categoryId];
+        return diaryService.getDiariesByCategory(category)
+                .flatMap(diary -> Flux.just(new DiaryResponse(diary.id(), diary.title(), diary.category())));
     }
 
     @GetMapping("/api/diary/{id}")
     ResponseEntity<DiaryDetailResponse> getById(@PathVariable Long id) {
         Diary diary = diaryService.getDiaryById(id);
-
         return ResponseEntity.ok(new DiaryDetailResponse(diary.id(), diary.title(), diary.content(), diary.date(), diary.category()));
-    }
-
-    @GetMapping("/api/diary/category/{category}")
-    ResponseEntity<DiaryListResponse> getCategory(@PathVariable DiaryEntity.Category category){
-        List<Diary> diaryList = diaryService.getDiariesByCategory(category);
-
-        List<DiaryResponse> diaryResponseList = new ArrayList<>();
-        for (Diary diary : diaryList){
-            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.category()));
-        }
-
-        return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
     }
 
     @PatchMapping("/api/diary/{id}")
