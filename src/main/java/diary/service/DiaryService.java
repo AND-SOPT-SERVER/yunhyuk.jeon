@@ -7,9 +7,8 @@ import diary.repository.DiaryEntity.Category;
 import diary.repository.DiaryRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @Component
@@ -43,43 +42,24 @@ public class DiaryService {
         diaryRepository.save(new DiaryEntity(title, content, LocalDateTime.now(), category));
     }
 
-    public ArrayList<Diary> getAllDiary() {
-        final List<DiaryEntity> diaryEntityList = diaryRepository.findAllByOrderByIdDesc();
-        final ArrayList<Diary> diaryList = new ArrayList<>();
-
-        for (DiaryEntity diaryEntity : diaryEntityList) {
-            diaryList.add(
-                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory())
-            );
-        }
-
-        return diaryList;
+    public Flux<Diary> getAllDiary() {
+        return Flux.fromIterable(diaryRepository.findAllByOrderByIdDesc())
+                .map(diaryEntity -> new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory()));
     }
 
-    public ArrayList<Diary> getRecentDiary() {
-        List<DiaryEntity> diaryEntityList = diaryRepository.findTop10ByOrderByIdDesc();
-        ArrayList<Diary> diaryList = new ArrayList<>();
-
-        for (DiaryEntity diaryEntity : diaryEntityList) {
-            diaryList.add(
-                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory())
-            );
-        }
-
-        return diaryList;
+    public Flux<Diary> getRecentDiary() {
+        return Flux.fromIterable(diaryRepository.findTop10ByOrderByIdDesc())
+                .map(diaryEntity -> new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory()));
     }
 
-    public ArrayList<Diary> getSortedDiary() {
-        List<DiaryEntity> diaryEntityList = diaryRepository.findTop10ByContentLength(PageRequest.of(0, 10));
-        ArrayList<Diary> diaryList = new ArrayList<>();
+    public Flux<Diary> getSortedDiary() {
+        return Flux.fromIterable(diaryRepository.findTop10ByContentLength(PageRequest.of(0, 10)))
+                .map(diaryEntity -> new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory()));
+    }
 
-        for (DiaryEntity diaryEntity : diaryEntityList) {
-            diaryList.add(
-                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory())
-            );
-        }
-
-        return diaryList;
+    public Flux<Diary> getDiariesByCategory(Category category) {
+        return Flux.fromIterable(diaryRepository.findByCategoryOrderByIdDesc(category))
+                .map(diaryEntity -> new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory()));
     }
 
     public Diary getDiaryById(Long id) {
@@ -109,18 +89,5 @@ public class DiaryService {
         DiaryEntity diaryEntity = diaryRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("일기를 찾을 수 없습니다. ID: " + id));
         diaryRepository.deleteById(id);
-    }
-
-    public ArrayList<Diary> getDiariesByCategory(Category category) {
-        List<DiaryEntity> diaryEntityList = diaryRepository.findByCategoryOrderByIdDesc(category);
-        ArrayList<Diary> diaryList = new ArrayList<>();
-
-        for (DiaryEntity diaryEntity : diaryEntityList) {
-            diaryList.add(
-                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory())
-            );
-        }
-
-        return diaryList;
     }
 }
