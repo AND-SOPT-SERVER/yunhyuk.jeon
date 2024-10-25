@@ -43,6 +43,6 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
     public String handleDataIntegrityViolation(DataIntegrityViolationException e) {
-        return "제목은 중복된 값이 불가능합니다.";
+        return "데이터베이스 무결성 오류가 발생했습니다. 다시 시도해주세요.";
     }
 }
