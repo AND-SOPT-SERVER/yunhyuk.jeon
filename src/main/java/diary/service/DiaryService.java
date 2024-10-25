@@ -21,6 +21,10 @@ public class DiaryService {
     }
 
     public void createDiary(String title, String content, Category category) {
+        if (diaryRepository.existsByTitle(title)) {
+            throw new IllegalArgumentException("제목은 중복된 값이 불가능합니다.");
+        }
+
         if (title.length() > 10) {
             throw new IllegalArgumentException("제목은 10자 이하로 작성해주세요.");
         } else if (content.length() > 30) {
