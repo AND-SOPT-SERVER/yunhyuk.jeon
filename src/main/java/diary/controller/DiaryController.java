@@ -1,4 +1,4 @@
-package diary.api;
+package diary.controller;
 
 import diary.dto.DiaryDetailResponse;
 import diary.dto.DiaryListResponse;
