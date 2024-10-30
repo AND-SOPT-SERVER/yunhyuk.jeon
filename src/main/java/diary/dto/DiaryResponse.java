@@ -2,5 +2,7 @@ package diary.dto;
 
 import diary.repository.DiaryEntity;
 
-public record DiaryResponse(long id, String title, DiaryEntity.Category category) {
+import java.time.LocalDateTime;
+
+public record DiaryResponse(long id, String title, String username, LocalDateTime date, DiaryEntity.Category category, boolean isVisible) {
 }
