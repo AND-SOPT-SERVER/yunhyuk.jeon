@@ -1,12 +1,9 @@
 package diary.controller;
 
-import diary.dto.DiaryDetailResponse;
-import diary.dto.DiaryListResponse;
-import diary.dto.DiaryRequest;
-import diary.dto.DiaryResponse;
-import diary.dto.Diary;
+import diary.dto.*;
 import diary.repository.DiaryEntity;
 import diary.service.DiaryService;
+import diary.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
@@ -15,15 +12,17 @@ import java.util.List;
 @RestController
 public class DiaryController {
     private final DiaryService diaryService;
+    private final UserService userService;
 
-    public DiaryController(DiaryService diaryService){
+    public DiaryController(DiaryService diaryService, UserService userService){
         this.diaryService = diaryService;
+        this.userService = userService;
     }
 
     @PostMapping("/api/diary")
-    void post(@RequestBody DiaryRequest diaryRequest){
+    void post(@RequestBody DiaryRequest diaryRequest, @RequestHeader("Authorization") String token){
         diaryRequest.validate();
-        diaryService.createDiary(diaryRequest.title(), diaryRequest.content(), diaryRequest.category());
+        diaryService.createDiary(token, diaryRequest.title(), diaryRequest.content(), diaryRequest.category(), diaryRequest.isVisible());
     }
 
     @GetMapping("/api/diary/all")
@@ -32,7 +31,7 @@ public class DiaryController {
 
         List<DiaryResponse> diaryResponseList = new ArrayList<>();
         for(Diary diary : diaryList){
-            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.category()));
+            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.date(), diary.category(), diary.isVisible()));
         }
 
         return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
@@ -44,7 +43,7 @@ public class DiaryController {
 
         List<DiaryResponse> diaryResponseList = new ArrayList<>();
         for(Diary diary : diaryList){
-            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.category()));
+            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.date(), diary.category(), diary.isVisible()));
         }
 
         return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
@@ -56,7 +55,7 @@ public class DiaryController {
 
         List<DiaryResponse> diaryResponseList = new ArrayList<>();
         for (Diary diary : diaryList){
-            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.category()));
+            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.date(), diary.category(), diary.isVisible()));
         }
 
         return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
@@ -66,7 +65,7 @@ public class DiaryController {
     ResponseEntity<DiaryDetailResponse> getById(@PathVariable Long id) {
         Diary diary = diaryService.getDiaryById(id);
 
-        return ResponseEntity.ok(new DiaryDetailResponse(diary.id(), diary.title(), diary.content(), diary.date(), diary.category()));
+        return ResponseEntity.ok(new DiaryDetailResponse(diary.id(), diary.title(), diary.content(), diary.date(), diary.category(), diary.isVisible()));
     }
 
     @GetMapping("/api/diary/category/{category}")
@@ -75,7 +74,7 @@ public class DiaryController {
 
         List<DiaryResponse> diaryResponseList = new ArrayList<>();
         for (Diary diary : diaryList){
-            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.category()));
+            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.date(), diary.category(), diary.isVisible()));
         }
 
         return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));

@@ -1,10 +1,14 @@
 package diary.service;
 
 import diary.dto.Diary;
+import diary.dto.User;
 import diary.exception.RateLimitException;
 import diary.repository.DiaryEntity;
 import diary.repository.DiaryEntity.Category;
 import diary.repository.DiaryRepository;
+import diary.repository.UserEntity;
+import diary.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
@@ -15,12 +19,15 @@ import java.util.NoSuchElementException;
 @Component
 public class DiaryService {
     private final DiaryRepository diaryRepository;
+    private final UserRepository userRepository;
 
-    public DiaryService(DiaryRepository diaryRepository) {
+    public DiaryService(DiaryRepository diaryRepository, UserRepository userRepository) {
         this.diaryRepository = diaryRepository;
+        this.userRepository = userRepository;
     }
 
-    public void createDiary(String title, String content, Category category) {
+    @Transactional
+    public void createDiary(String token, String title, String content, Category category, boolean isVisible) {
         if (diaryRepository.existsByTitle(title)) {
             throw new IllegalArgumentException("제목은 중복된 값이 불가능합니다.");
         }
@@ -40,7 +47,10 @@ public class DiaryService {
             }
         }
 
-        diaryRepository.save(new DiaryEntity(title, content, LocalDateTime.now(), category));
+        UserEntity userEntity = userRepository.findByUsername(token)
+                .orElseThrow(() -> new NoSuchElementException("사용자 식별자를 찾을 수 없습니다. token: " + token));
+
+        diaryRepository.save(new DiaryEntity(userEntity, title, content, LocalDateTime.now(), category, isVisible));
     }
 
     public ArrayList<Diary> getAllDiary() {
@@ -49,7 +59,7 @@ public class DiaryService {
 
         for (DiaryEntity diaryEntity : diaryEntityList) {
             diaryList.add(
-                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory())
+                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory(), diaryEntity.getIsVisible())
             );
         }
 
@@ -62,7 +72,7 @@ public class DiaryService {
 
         for (DiaryEntity diaryEntity : diaryEntityList) {
             diaryList.add(
-                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory())
+                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory(), diaryEntity.getIsVisible())
             );
         }
 
@@ -75,7 +85,7 @@ public class DiaryService {
 
         for (DiaryEntity diaryEntity : diaryEntityList) {
             diaryList.add(
-                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory())
+                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory(), diaryEntity.getIsVisible())
             );
         }
 
@@ -86,7 +96,7 @@ public class DiaryService {
         DiaryEntity diaryEntity = diaryRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("일기를 찾을 수 없습니다. ID: " + id));
 
-        return new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory());
+        return new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory(), diaryEntity.getIsVisible());
     }
 
     public void updateDiary(Long id, String title, String content, Category category) {
@@ -117,7 +127,7 @@ public class DiaryService {
 
         for (DiaryEntity diaryEntity : diaryEntityList) {
             diaryList.add(
-                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory())
+                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory(), diaryEntity.getIsVisible())
             );
         }
 
