@@ -1,7 +1,6 @@
 package diary.service;
 
 import diary.dto.Diary;
-import diary.dto.User;
 import diary.exception.RateLimitException;
 import diary.repository.DiaryEntity;
 import diary.repository.DiaryEntity.Category;
@@ -27,7 +26,7 @@ public class DiaryService {
     }
 
     @Transactional
-    public void createDiary(String token, String title, String content, Category category, boolean isVisible) {
+    public void createDiary(Long token, String title, String content, Category category, boolean isVisible) {
         if (diaryRepository.existsByTitle(title)) {
             throw new IllegalArgumentException("제목은 중복된 값이 불가능합니다.");
         }
@@ -38,7 +37,7 @@ public class DiaryService {
             throw new IllegalArgumentException("내용은 30자 이하로 작성해주세요.");
         }
 
-        DiaryEntity lastDiary = diaryRepository.findTopByOrderByIdDesc().orElse(null);
+        DiaryEntity lastDiary = diaryRepository.findTopByIsVisibleTrueOrderByIdDesc().orElse(null);
         if (lastDiary != null) {
             LocalDateTime lastDate = lastDiary.getDate();
             LocalDateTime now = LocalDateTime.now();
@@ -47,14 +46,14 @@ public class DiaryService {
             }
         }
 
-        UserEntity userEntity = userRepository.findByUsername(token)
+        UserEntity userEntity = userRepository.findById(token)
                 .orElseThrow(() -> new NoSuchElementException("사용자 식별자를 찾을 수 없습니다. token: " + token));
 
         diaryRepository.save(new DiaryEntity(userEntity, title, content, LocalDateTime.now(), category, isVisible));
     }
 
     public ArrayList<Diary> getAllDiary() {
-        final List<DiaryEntity> diaryEntityList = diaryRepository.findAllByOrderByIdDesc();
+        final List<DiaryEntity> diaryEntityList = diaryRepository.findAllByIsVisibleTrueOrderByIdDesc();
         final ArrayList<Diary> diaryList = new ArrayList<>();
 
         for (DiaryEntity diaryEntity : diaryEntityList) {
@@ -67,7 +66,7 @@ public class DiaryService {
     }
 
     public ArrayList<Diary> getRecentDiary() {
-        List<DiaryEntity> diaryEntityList = diaryRepository.findTop10ByOrderByIdDesc();
+        List<DiaryEntity> diaryEntityList = diaryRepository.findTop10ByIsVisibleTrueOrderByIdDesc();
         ArrayList<Diary> diaryList = new ArrayList<>();
 
         for (DiaryEntity diaryEntity : diaryEntityList) {
@@ -80,7 +79,20 @@ public class DiaryService {
     }
 
     public ArrayList<Diary> getSortedDiary() {
-        List<DiaryEntity> diaryEntityList = diaryRepository.findTop10ByContentLength(PageRequest.of(0, 10));
+        List<DiaryEntity> diaryEntityList = diaryRepository.findTop10ByIsVisibleContentLength(PageRequest.of(0, 10));
+        ArrayList<Diary> diaryList = new ArrayList<>();
+
+        for (DiaryEntity diaryEntity : diaryEntityList) {
+            diaryList.add(
+                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory(), diaryEntity.getIsVisible())
+            );
+        }
+
+        return diaryList;
+    }
+
+    public ArrayList<Diary> getUserDiary(Long userId){
+        List<DiaryEntity> diaryEntityList = diaryRepository.findByUserIdOrderByIdDesc(userId);
         ArrayList<Diary> diaryList = new ArrayList<>();
 
         for (DiaryEntity diaryEntity : diaryEntityList) {
@@ -122,7 +134,7 @@ public class DiaryService {
     }
 
     public ArrayList<Diary> getDiariesByCategory(Category category) {
-        List<DiaryEntity> diaryEntityList = diaryRepository.findByCategoryOrderByIdDesc(category);
+        List<DiaryEntity> diaryEntityList = diaryRepository.findByCategoryAndIsVisibleTrueOrderByIdDesc(category);
         ArrayList<Diary> diaryList = new ArrayList<>();
 
         for (DiaryEntity diaryEntity : diaryEntityList) {
