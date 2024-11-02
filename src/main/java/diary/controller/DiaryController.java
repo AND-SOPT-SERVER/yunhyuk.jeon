@@ -3,7 +3,6 @@ package diary.controller;
 import diary.dto.*;
 import diary.repository.DiaryEntity;
 import diary.service.DiaryService;
-import diary.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
