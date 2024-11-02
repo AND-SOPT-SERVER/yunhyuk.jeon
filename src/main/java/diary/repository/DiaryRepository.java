@@ -10,11 +10,12 @@ import java.util.Optional;
 
 @Component
 public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
-    Optional<DiaryEntity> findTopByOrderByIdDesc();
-    List<DiaryEntity> findAllByOrderByIdDesc();
-    List<DiaryEntity> findTop10ByOrderByIdDesc();
-    @Query("SELECT d FROM DiaryEntity d ORDER BY LENGTH(d.content) DESC, d.id DESC")
-    List<DiaryEntity> findTop10ByContentLength(PageRequest pageRequest);
+    Optional<DiaryEntity> findTopByIsVisibleTrueOrderByIdDesc();
+    List<DiaryEntity> findAllByIsVisibleTrueOrderByIdDesc();
+    List<DiaryEntity> findTop10ByIsVisibleTrueOrderByIdDesc();
+    @Query("SELECT d FROM DiaryEntity d WHERE d.isVisible = true ORDER BY LENGTH(d.content) DESC, d.id DESC")
+    List<DiaryEntity> findTop10ByIsVisibleContentLength(PageRequest pageRequest);
     boolean existsByTitle(String title);
-    List<DiaryEntity> findByCategoryOrderByIdDesc(DiaryEntity.Category category);
+    List<DiaryEntity> findByCategoryAndIsVisibleTrueOrderByIdDesc(DiaryEntity.Category category);
+    List<DiaryEntity> findByUserIdOrderByIdDesc(Long userId);
 }
