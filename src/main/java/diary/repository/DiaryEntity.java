@@ -65,6 +65,10 @@ public class DiaryEntity {
         return isVisible;
     }
 
+    public UserEntity getUser() {
+        return user;
+    }
+
     public void setTitle(String title) {
         this.title = title;
     }

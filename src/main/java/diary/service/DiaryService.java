@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Component
 public class DiaryService {
@@ -58,7 +59,7 @@ public class DiaryService {
 
         for (DiaryEntity diaryEntity : diaryEntityList) {
             diaryList.add(
-                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory(), diaryEntity.getIsVisible())
+                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory(), diaryEntity.getIsVisible(), diaryEntity.getUser().getId(), diaryEntity.getUser().getNickname())
             );
         }
 
@@ -71,7 +72,7 @@ public class DiaryService {
 
         for (DiaryEntity diaryEntity : diaryEntityList) {
             diaryList.add(
-                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory(), diaryEntity.getIsVisible())
+                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory(), diaryEntity.getIsVisible(), diaryEntity.getUser().getId(), diaryEntity.getUser().getNickname())
             );
         }
 
@@ -84,7 +85,7 @@ public class DiaryService {
 
         for (DiaryEntity diaryEntity : diaryEntityList) {
             diaryList.add(
-                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory(), diaryEntity.getIsVisible())
+                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory(), diaryEntity.getIsVisible(), diaryEntity.getUser().getId(), diaryEntity.getUser().getNickname())
             );
         }
 
@@ -97,7 +98,7 @@ public class DiaryService {
 
         for (DiaryEntity diaryEntity : diaryEntityList) {
             diaryList.add(
-                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory(), diaryEntity.getIsVisible())
+                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory(), diaryEntity.getIsVisible(), diaryEntity.getUser().getId(), diaryEntity.getUser().getNickname())
             );
         }
 
@@ -108,7 +109,7 @@ public class DiaryService {
         DiaryEntity diaryEntity = diaryRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("일기를 찾을 수 없습니다. ID: " + id));
 
-        return new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory(), diaryEntity.getIsVisible());
+        return new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory(), diaryEntity.getIsVisible(), diaryEntity.getUser().getId(), diaryEntity.getUser().getNickname());
     }
 
     public void updateDiary(Long id, String title, String content, Category category) {
@@ -139,7 +140,7 @@ public class DiaryService {
 
         for (DiaryEntity diaryEntity : diaryEntityList) {
             diaryList.add(
-                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory(), diaryEntity.getIsVisible())
+                    new Diary(diaryEntity.getId(), diaryEntity.getTitle(), diaryEntity.getContent(), diaryEntity.getDate(), diaryEntity.getCategory(), diaryEntity.getIsVisible(), diaryEntity.getUser().getId(), diaryEntity.getUser().getNickname())
             );
         }
 

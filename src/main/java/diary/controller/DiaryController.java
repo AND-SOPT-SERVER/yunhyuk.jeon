@@ -29,7 +29,7 @@ public class DiaryController {
 
         List<DiaryResponse> diaryResponseList = new ArrayList<>();
         for(Diary diary : diaryList){
-            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title() ,diary.date(), diary.category(), diary.isVisible()));
+            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title() ,diary.date(), diary.category(), diary.isVisible(), diary.userId(), diary.nickname()));
         }
 
         return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
@@ -41,7 +41,7 @@ public class DiaryController {
 
         List<DiaryResponse> diaryResponseList = new ArrayList<>();
         for(Diary diary : diaryList){
-            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.date(), diary.category(), diary.isVisible()));
+            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.date(), diary.category(), diary.isVisible(), diary.userId(), diary.nickname()));
         }
 
         return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
@@ -53,7 +53,7 @@ public class DiaryController {
 
         List<DiaryResponse> diaryResponseList = new ArrayList<>();
         for (Diary diary : diaryList){
-            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.date(), diary.category(), diary.isVisible()));
+            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.date(), diary.category(), diary.isVisible(), diary.userId(), diary.nickname()));
         }
 
         return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
@@ -63,7 +63,7 @@ public class DiaryController {
     ResponseEntity<DiaryDetailResponse> getById(@PathVariable Long id, @RequestHeader("Authorization") Long token) {
         Diary diary = diaryService.getDiaryById(id);
 
-        return ResponseEntity.ok(new DiaryDetailResponse(diary.id(), diary.title(), diary.content(), diary.date(), diary.category(), diary.isVisible()));
+        return ResponseEntity.ok(new DiaryDetailResponse(diary.id(), diary.title(), diary.content(), diary.date(), diary.category(), diary.isVisible(), diary.userId(), diary.nickname()));
     }
 
     @GetMapping("/api/diary/category/{category}")
@@ -72,7 +72,7 @@ public class DiaryController {
 
         List<DiaryResponse> diaryResponseList = new ArrayList<>();
         for (Diary diary : diaryList){
-            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.date(), diary.category(), diary.isVisible()));
+            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title(), diary.date(), diary.category(), diary.isVisible(), diary.userId(), diary.nickname()));
         }
 
         return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
@@ -84,7 +84,7 @@ public class DiaryController {
 
         List<DiaryResponse> diaryResponseList = new ArrayList<>();
         for(Diary diary : diaryList){
-            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title() ,diary.date(), diary.category(), diary.isVisible()));
+            diaryResponseList.add(new DiaryResponse(diary.id(), diary.title() ,diary.date(), diary.category(), diary.isVisible(), diary.userId(), diary.nickname()));
         }
 
         return ResponseEntity.ok(new DiaryListResponse(diaryResponseList));
