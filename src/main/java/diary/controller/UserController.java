@@ -1,6 +1,5 @@
 package diary.controller;
 
-import diary.dto.DiaryListResponse;
 import diary.dto.LoginRequest;
 import diary.dto.RegisterRequest;
 import diary.service.UserService;
